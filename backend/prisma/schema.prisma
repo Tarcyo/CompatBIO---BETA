@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model plano {
+  id                        Int          @id @default(autoincrement())
+  prioridade_de_tempo       Int
+  nome                      String       @db.VarChar(150)
+  preco_mensal              Decimal      @default(0.00) @db.Decimal(10, 2)
+  quantidade_credito_mensal Int          @default(0)
+  created_at                DateTime     @default(now()) @db.DateTime(0)
+  stripe_price_id           String?      @db.VarChar(255)
+  maximo_colaboradores      Int          @default(0)
+  assinatura                assinatura[]
+
+  @@map("plano")
+}
+
+model usuario {
+  id                    Int                   @id @default(autoincrement())
+  nome                  String                @db.VarChar(200)
+  data_nascimento       DateTime?             @db.Date
+  cpf                   String                @unique(map: "cpf") @db.Char(11)
+  email                 String                @unique(map: "email") @db.VarChar(254)
+  senha                 String                @db.VarChar(255)
+  tipo_usuario          String?               @db.VarChar(50)
+  id_vinculo_assinatura Int?
+  telefone              String?               @db.VarChar(30)
+  cidade                String?               @db.VarChar(100)
+  estado                String?               @db.VarChar(50)
+  created_at            DateTime              @default(now()) @db.DateTime(0)
+  updated_at            DateTime              @default(now()) @updatedAt @db.DateTime(0)
+  id_empresa            Int?
+  ja_fez_compra         Boolean               @default(false)
+  assinaturasDono       assinatura[]          @relation("AssinaturaToUsuario")
+  compras               compra[]              @relation("CompraUsuario")
+  logs                  logs_usuario[]
+  pacotes_creditos      pacote_creditos[]
+  receitas              receita[]             @relation("ReceitaUsuario")
+  solicitacoesEnviadas  solicitacao_analise[] @relation("SolicitacaoUsuario")
+  vinculoAssinatura     assinatura?           @relation("UsuarioVinculo", fields: [id_vinculo_assinatura], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_assinatura")
+  empresa_rel           empresa?              @relation("UsuarioEmpresa", fields: [id_empresa], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_empresa")
+
+  @@index([id_vinculo_assinatura], map: "fk_usuario_assinatura")
+  @@index([id_empresa], map: "fk_usuario_empresa_idx")
+}
+
+model assinatura {
+  id                     Int       @id @default(autoincrement())
+  id_plano               Int
+  id_dono                Int
+  data_assinatura        DateTime  @default(dbgenerated("(curdate())")) @db.Date
+  data_renovacao         DateTime? @db.Date
+  ativo                  Boolean   @default(true)
+  criado_em              DateTime  @default(now()) @db.DateTime(0)
+  stripe_subscription_id String?   @unique(map: "uk_assinatura_stripe_subscription") @db.VarChar(255)
+  stripe_customer_id     String?   @db.VarChar(255)
+  stripe_price_id        String?   @db.VarChar(255)
+  status                 String?   @db.VarChar(60)
+  current_period_end     DateTime? @db.DateTime(0)
+  cancel_at_period_end   Boolean?  @default(false)
+  canceled_at            DateTime? @db.DateTime(0)
+  plano                  plano     @relation(fields: [id_plano], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_assinatura_plano")
+  usuario                usuario   @relation("AssinaturaToUsuario", fields: [id_dono], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_assinatura_usuario")
+  vinculo_usuarios       usuario[] @relation("UsuarioVinculo")
+
+  @@index([id_plano], map: "fk_assinatura_plano")
+  @@index([id_dono], map: "fk_assinatura_usuario")
+  @@map("assinatura")
+}
+
+model produto {
+  id                        Int                   @id @default(autoincrement())
+  nome                      String                @unique(map: "uk_produto_nome") @db.VarChar(255)
+  tipo                      String                @db.VarChar(100)
+  genero                    GeneroProduto
+  demo                      Boolean               @default(false)
+  catalogosComoBiologico    catalogo_resultado[]  @relation("CatalogoBio")
+  catalogosComoQuimico      catalogo_resultado[]  @relation("CatalogoQuim")
+  solicitacoesComoBiologico solicitacao_analise[] @relation("SolicitacaoBio")
+  solicitacoesComoQuimico   solicitacao_analise[] @relation("SolicitacaoQuim")
+}
+
+model catalogo_resultado {
+  id                   Int      @id @default(autoincrement())
+  id_produto_quimico   Int
+  id_produto_biologico Int
+  resultado_final      String?  @db.Text
+  descricao_resultado  String?  @db.Text
+  criado_em            DateTime @default(now()) @db.DateTime(0)
+  produto_biologico    produto  @relation("CatalogoBio", fields: [id_produto_biologico], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catalogo_bio")
+  produto_quimico      produto  @relation("CatalogoQuim", fields: [id_produto_quimico], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catalogo_quim")
+
+  @@unique([id_produto_quimico, id_produto_biologico], name: "catalogo_unique_pair", map: "catalogo_unique_pair")
+  @@index([id_produto_biologico], map: "fk_catalogo_bio_idx")
+  @@index([id_produto_quimico], map: "fk_catalogo_quim_idx")
+}
+
+model config_sistema {
+  id                               Int      @id @default(autoincrement())
+  data_estabelecimento             DateTime @default(dbgenerated("(curdate())")) @db.Date
+  preco_do_credito                 Decimal  @default(0.0000) @db.Decimal(10, 4)
+  preco_da_solicitacao_em_creditos Int      @default(0)
+  descricao                        String?  @db.Text
+  validade_em_dias                 Int      @default(0)
+  atualizado_em                    DateTime @default(now()) @db.DateTime(0)
+}
+
+model logs_usuario {
+  id              Int      @id @default(autoincrement())
+  id_do_usuario   Int
+  acao_no_sistema String   @db.Text
+  data_acao       DateTime @default(now()) @db.DateTime(0)
+  usuario         usuario  @relation(fields: [id_do_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_logs_usuario_usuario")
+
+  @@index([id_do_usuario], map: "fk_logs_usuario_usuario")
+}
+
+model solicitacao_analise {
+  id                   Int               @id @default(autoincrement())
+  id_produto_biologico Int
+  id_produto_quimico   Int
+  prioridade           Int               @default(0)
+  data_solicitacao     DateTime          @default(now()) @db.DateTime(0)
+  data_resultado       DateTime?         @db.DateTime(0)
+  resultado_final      String?           @db.Text
+  status               SolicitacaoStatus @default(em_andamento)
+  descricao_resultado  String?           @db.Text
+  id_usuario           Int?
+  produto_biologico    produto           @relation("SolicitacaoBio", fields: [id_produto_biologico], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_solic_bio_prod")
+  produto_quimico      produto           @relation("SolicitacaoQuim", fields: [id_produto_quimico], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_solic_quim_prod")
+  usuario              usuario?          @relation("SolicitacaoUsuario", fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_solicitacao_usuario")
+
+  @@index([id_produto_biologico], map: "fk_solic_bio_prod")
+  @@index([id_produto_quimico], map: "fk_solic_quim_prod")
+  @@index([status], map: "idx_solicitacao_status")
+  @@index([data_solicitacao], map: "idx_solicitacao_data_solicitacao")
+  @@index([id_usuario], map: "idx_solicitacao_usuario")
+}
+
+model pacote_creditos {
+  id               Int      @id @default(autoincrement())
+  id_usuario       Int
+  quantidade       Int
+  origem           String   @db.VarChar(255)
+  data_recebimento DateTime @default(now()) @db.DateTime(0)
+  usuario          usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pacote_creditos_usuario")
+
+  @@index([id_usuario], map: "fk_pacote_creditos_usuario")
+}
+
+model compra {
+  id                Int      @id @default(autoincrement())
+  id_usuario        Int?
+  valor_pago        Decimal  @default(0.00) @db.Decimal(10, 2)
+  descricao         String   @db.Text
+  stripe_session_id String?  @unique(map: "uk_compra_stripe_session") @db.VarChar(255)
+  payment_intent_id String?  @db.VarChar(255)
+  created_at        DateTime @default(now()) @db.DateTime(0)
+  usuario           usuario? @relation("CompraUsuario", fields: [id_usuario], references: [id], onUpdate: NoAction, map: "fk_compra_usuario")
+
+  @@index([id_usuario], map: "fk_compra_usuario")
+  @@index([payment_intent_id], map: "idx_compra_payment_intent")
+}
+
+model receita {
+  id         Int      @id @default(autoincrement())
+  data       DateTime @default(now()) @db.DateTime(0)
+  valor      Decimal  @default(0.00) @db.Decimal(10, 2)
+  descricao  String   @db.Text
+  id_usuario Int?
+  usuario    usuario? @relation("ReceitaUsuario", fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_receita_usuario")
+
+  @@index([id_usuario], map: "fk_receita_usuario")
+}
+
+model empresa {
+  id       Int       @id @default(autoincrement())
+  nome     String    @db.VarChar(200)
+  cnpj     String    @unique(map: "uk_empresa_cnpj") @db.Char(14)
+  corTema  String    @db.Char(7)
+  logo     Bytes?
+  usuarios usuario[] @relation("UsuarioEmpresa")
+}
+
+model stripe_event {
+  id           Int       @id @default(autoincrement())
+  event_id     String    @unique(map: "uk_stripe_event_event_id") @db.VarChar(255)
+  processed    Boolean   @default(false)
+  payload      Json?
+  received_at  DateTime  @default(now()) @db.DateTime(0)
+  processed_at DateTime? @db.DateTime(0)
+
+  @@index([processed], map: "idx_stripe_event_processed")
+}
+
+model password_reset_token {
+  id         Int       @id @default(autoincrement())
+  email      String    @db.VarChar(254)
+  hmac       String    @db.VarChar(128)
+  expires_at DateTime  @db.DateTime(0)
+  jti        String?   @unique(map: "idx_password_reset_jti") @db.VarChar(64)
+  used       Boolean   @default(false)
+  consumed   Boolean   @default(false)
+  attempts   Int       @default(0)
+  created_at DateTime  @default(now()) @db.DateTime(0)
+  used_at    DateTime? @db.DateTime(0)
+
+  @@index([email], map: "idx_password_reset_email")
+}
+
+model revoked_jti {
+  id         Int      @id @default(autoincrement())
+  jti        String   @unique(map: "uk_revoked_jti_jti") @db.VarChar(255)
+  reason     String?  @db.VarChar(255)
+  created_at DateTime @default(now()) @db.DateTime(0)
+}
+
+enum GeneroProduto {
+  quimico
+  biologico
+}
+
+enum SolicitacaoStatus {
+  em_andamento
+  finalizado
+}
