@@ -1,0 +1,50 @@
+name: planos
+description: "A new Flutter project."
+publish_to: 'none' # Remova se for publicar em pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.8.1 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  fl_chart: ^1.1.0
+  http: ^1.5.0
+  intl: ^0.20.2
+  provider: ^5.0.0
+  image_picker: ^1.2.0
+  shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
+  flutter_dotenv: ^6.0.0
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+# Configuração do flutter_launcher_icons — deve ficar no nível raiz
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/meuicon.png"
+
+dependency_overrides:
+  vector_math: ^2.2.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/Fredoka.ttf
+    - assets/icon.png
+    - assets/meuicon.png
+    - env.txt
+
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/Fredoka.ttf
