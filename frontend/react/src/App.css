@@ -1,0 +1,129 @@
+.page {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.card {
+  width: min(920px, 88vw);
+  border-radius: 18px;
+
+  padding: 44px 36px 34px;
+background: rgba(12, 16, 24, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.logo {
+  display: block;
+  height: 64px;
+  width: auto;
+  margin: 0 auto 22px;
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.16);
+  margin: 0 0 34px;
+}
+
+.title {
+  margin: 0 0 26px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.googleButton {
+  width: min(760px, 82vw);
+  margin: 0 auto 24px;
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(28, 35, 46, 0.85);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 24px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.googleButton:active {
+  transform: translateY(1px);
+}
+
+.googleIcon {
+  width: 34px;
+  height: 34px;
+}
+
+.terms {
+  margin: 0;
+  text-align: center;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.help {
+  margin: 22px 0 0;
+  text-align: center;
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: 30px 18px 24px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .googleButton {
+    height: 66px;
+    font-size: 18px;
+    gap: 12px;
+  }
+
+  .googleIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .terms {
+    font-size: 14px;
+  }
+
+  .help {
+    font-size: 16px;
+  }
+
+  .logo {
+    height: 54px;
+  }
+}

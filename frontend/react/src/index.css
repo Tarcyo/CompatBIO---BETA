@@ -1,0 +1,87 @@
+/* ✅ CSS GLOBAL — força a fonte do site inteiro sem “quebrar” layout
+   - carrega a fonte do arquivo em /assets
+   - aplica em toda a árvore (inclusive inputs/botões)
+   - evita ser sobrescrito (usa !important com cuidado)
+   - não bloqueia render (font-display: swap)
+*/
+
+/* =========================
+   FONT FACE
+========================= */
+@font-face {
+  font-family: "MinhaFonte";
+  src: url("./assets/fonte.ttf") format("opentype");
+  font-weight: 100 900; /* permite variar (se a fonte suportar) */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* (opcional) se você tiver uma versão itálica separada, ative e ajuste o nome:
+@font-face {
+  font-family: "MinhaFonte";
+  src: url("./assets/MinhaFonte-Italic.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+*/
+
+/* =========================
+   RESET / BASE
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* define variável global da fonte */
+:root {
+  --app-font: "MinhaFonte", Arial, sans-serif;
+}
+
+/* base do documento */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--app-font) !important;
+}
+
+/* ✅ FORÇA herança em absolutamente tudo
+   (isso impede qualquer componente de “trocar” a fonte sem querer) */
+*,
+*::before,
+*::after {
+  font-family: inherit !important;
+}
+
+/* ✅ elementos que frequentemente não herdam bem em alguns browsers */
+button,
+input,
+textarea,
+select,
+option,
+label {
+  font-family: inherit !important;
+}
+
+/* ✅ evita que pseudo-elementos ou controles de formulário mudem aparência de fonte */
+::placeholder {
+  font-family: inherit !important;
+}
+
+/* (opcional) mantém consistência em SVG/Canvas text, se você usar */
+svg text {
+  font-family: inherit !important;
+}
+
+/* =========================
+   GARANTIAS DE NÃO “OBSTRUIR”
+   (não altera layout, só tipografia)
+========================= */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
