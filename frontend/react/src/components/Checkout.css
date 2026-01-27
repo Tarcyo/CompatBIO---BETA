@@ -1,0 +1,476 @@
+/* CheckoutConfirm.css */
+
+/* =========================
+   CARD PRINCIPAL (mesmo molde glass)
+========================= */
+.checkoutCard {
+  width: min(980px, 100%);
+  padding: 28px 30px 26px;
+  border-radius: 12px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(26, 38, 54, 0.48) 0%,
+    rgba(16, 24, 36, 0.42) 100%
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+  color: rgba(255, 255, 255, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+/* brilho sutil */
+.checkoutCard::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    700px 260px at 24% 18%,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.00) 55%
+  );
+  opacity: 0.9;
+}
+
+/* camada de profundidade */
+.checkoutCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.00) 42%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  opacity: 0.55;
+}
+
+/* conteúdo acima dos efeitos */
+.checkoutCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+.checkoutDivider {
+  margin: 18px 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* =========================
+   TOPO
+========================= */
+.checkoutTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.checkoutTitle {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 950;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.checkoutSubtitle {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.totalPill {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+
+  padding: 10px 12px;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  text-align: right;
+  min-width: 170px;
+}
+
+.totalPillLabel {
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.totalPillValue {
+  font-size: 20px;
+  font-weight: 950;
+  color: rgba(160, 234, 82, 0.96);
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+/* =========================
+   RESUMO
+========================= */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.summaryItem {
+  padding: 14px 14px;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.summaryItem.is-total {
+  background: linear-gradient(
+    180deg,
+    rgba(160, 234, 82, 0.18) 0%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  border-color: rgba(180, 255, 120, 0.22);
+}
+
+.summaryLabel {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.summaryValue {
+  font-size: 18px;
+  font-weight: 950;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.summaryValue.is-strong {
+  color: rgba(160, 234, 82, 0.96);
+}
+
+.summaryValueRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.summaryHint {
+  font-size: 13px;
+  font-weight: 850;
+  color: rgba(255, 255, 255, 0.70);
+}
+
+/* input de créditos */
+.creditsInput {
+  width: 120px;
+  height: 40px;
+  padding: 0 10px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.18);
+
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 15px;
+  font-weight: 950;
+
+  outline: none;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.creditsInput:focus {
+  border-color: rgba(180, 255, 120, 0.38);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* =========================
+   PAGAMENTO
+========================= */
+.sectionTitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 950;
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.payOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.payOption {
+  border-radius: 12px;
+  padding: 14px 14px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, filter 180ms ease;
+}
+
+.payOption:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.payOption.is-selected {
+  background: linear-gradient(
+    180deg,
+    rgba(160, 234, 82, 0.18) 0%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
+  border-color: rgba(180, 255, 120, 0.28);
+}
+
+.payRadio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.payOptionTop {
+  display: grid;
+  grid-template-columns: 44px 1fr 22px;
+  gap: 12px;
+  align-items: center;
+}
+
+.payIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.payIcon {
+  width: 22px;
+  height: 22px;
+  opacity: 0.95;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.payTexts {
+  min-width: 0;
+}
+
+.payTitle {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 950;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.payDesc {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  font-weight: 850;
+  color: rgba(255, 255, 255, 0.70);
+}
+
+.paySelectedIco {
+  width: 20px;
+  height: 20px;
+  color: rgba(160, 234, 82, 0.96);
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.24));
+}
+
+.payFoot {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.payMini {
+  font-size: 12.5px;
+  font-weight: 850;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+/* =========================
+   AÇÕES
+========================= */
+.checkoutActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.confirmNote {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 10px;
+
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 12.8px;
+  font-weight: 850;
+}
+
+.confirmNoteIco {
+  width: 18px;
+  height: 18px;
+  color: rgba(160, 234, 82, 0.95);
+}
+
+.concludeBtn {
+  height: 44px;
+  min-width: 220px;
+  padding: 0 18px;
+  border-radius: 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  background: linear-gradient(
+    180deg,
+    rgba(160, 234, 82, 0.98) 0%,
+    rgba(76, 148, 18, 0.96) 100%
+  );
+
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.concludeBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.concludeBtn:active {
+  transform: translateY(0);
+}
+
+.concludeBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+@media (max-width: 860px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .payOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .totalPill {
+    min-width: 150px;
+  }
+}
+.checkoutBtns {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  height: 44px;
+  min-width: 180px;
+  padding: 0 18px;
+  border-radius: 10px;
+
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 180ms ease, filter 180ms ease, background 180ms ease;
+}
+
+.cancelBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.07);
+  filter: brightness(1.02);
+}
+
+.cancelBtn:active {
+  transform: translateY(0);
+}
+
+.cancelBtn:focus-visible {
+  outline: 2px solid rgba(180, 255, 120, 0.45);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .checkoutBtns {
+    width: 100%;
+  }
+
+  .cancelBtn,
+  .concludeBtn {
+    width: 100%;
+  }
+}

@@ -1,5 +1,7 @@
+// ProfilePage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import "./Pages.css";
+import "./Profile.css";
 
 function IconEdit(props) {
   return (
@@ -11,7 +13,6 @@ function IconEdit(props) {
     </svg>
   );
 }
-
 function IconSave(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -22,7 +23,6 @@ function IconSave(props) {
     </svg>
   );
 }
-
 function IconClose(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -33,7 +33,6 @@ function IconClose(props) {
     </svg>
   );
 }
-
 function IconMail(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -44,7 +43,6 @@ function IconMail(props) {
     </svg>
   );
 }
-
 function IconPin(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -55,7 +53,6 @@ function IconPin(props) {
     </svg>
   );
 }
-
 function IconHome(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -66,7 +63,6 @@ function IconHome(props) {
     </svg>
   );
 }
-
 function IconUser(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -79,21 +75,17 @@ function IconUser(props) {
 }
 
 export default function ProfilePage() {
-  const STORAGE_KEY = "compatbio_profile";
+  const API_BASE = (import.meta?.env?.VITE_API_URL || "http://localhost:3000")
+    .toString()
+    .replace(/\/+$/, "");
 
-  const defaultProfile = useMemo(
-    () => ({
-      name: "Carlos Souza",
-      email: "carlos.souza@email.com",
-      address: "Rua das Palmeiras, 123, São Paulo, SP",
-      company: "AgroTech Solutions",
-      avatarUrl: "https://i.pravatar.cc/220?img=12",
-    }),
-    []
-  );
+  const STORAGE_KEY = "compatbio_profile_app_fields";
 
-  const [profile, setProfile] = useState(defaultProfile);
-  const [draft, setDraft] = useState(defaultProfile);
+  const [googleUser, setGoogleUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  const [appFields, setAppFields] = useState({ address: "", company: "" });
+  const [draft, setDraft] = useState({ address: "", company: "" });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -101,185 +93,234 @@ export default function ProfilePage() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw);
-      const next = { ...defaultProfile, ...parsed };
-      setProfile(next);
-      setDraft(next);
-    } catch {
-      // ignore
+      setAppFields({
+        address: typeof parsed?.address === "string" ? parsed.address : "",
+        company: typeof parsed?.company === "string" ? parsed.company : "",
+      });
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadMe() {
+      setLoadingUser(true);
+      try {
+        const res = await fetch(`${API_BASE}/me`, {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("401");
+        const data = await res.json();
+        if (!alive) return;
+        setGoogleUser(data.user);
+      } catch {
+        if (!alive) return;
+        setGoogleUser(null);
+      } finally {
+        if (!alive) return;
+        setLoadingUser(false);
+      }
     }
-  }, [defaultProfile]);
+
+    loadMe();
+    return () => {
+      alive = false;
+    };
+  }, [API_BASE]);
+
+  const profile = useMemo(() => {
+    return {
+      name: googleUser?.name || "",
+      email: googleUser?.email || "",
+      avatarUrl: googleUser?.picture || "",
+      address: appFields.address || "—",
+      company: appFields.company || "—",
+    };
+  }, [googleUser, appFields]);
 
   const startEdit = () => {
-    setDraft(profile);
+    setDraft({ ...appFields });
     setIsEditing(true);
   };
 
   const cancelEdit = () => {
-    setDraft(profile);
+    setDraft({ ...appFields });
     setIsEditing(false);
   };
 
   const saveEdit = () => {
     const trimmed = {
-      ...draft,
-      name: draft.name.trim(),
-      email: draft.email.trim(),
-      address: draft.address.trim(),
-      company: draft.company.trim(),
+      address: (draft.address || "").trim(),
+      company: (draft.company || "").trim(),
     };
-
-    setProfile(trimmed);
-    setDraft(trimmed);
+    setAppFields(trimmed);
     setIsEditing(false);
-
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-    } catch {
-      // ignore
-    }
+    } catch {}
   };
 
   const onDraft = (key) => (e) => setDraft((p) => ({ ...p, [key]: e.target.value }));
 
+  if (loadingUser) {
+    return (
+      <div className="pg-wrap">
+        <header className="pg-header">
+          <h1 className="pg-title">Perfil</h1>
+        </header>
+        <section className="pg-card profileCard">
+          <p className="profileText">Carregando dados do Google...</p>
+        </section>
+      </div>
+    );
+  }
+
+  if (!googleUser) {
+    return (
+      <div className="pg-wrap">
+        <header className="pg-header">
+          <h1 className="pg-title">Perfil</h1>
+        </header>
+        <section className="pg-card profileCard">
+          <p className="profileText">
+            Não autenticado. Faça login com Google novamente.
+          </p>
+          <pre className="profileText" style={{ opacity: 0.8 }}>
+            GET {API_BASE}/me retornou 401/erro
+          </pre>
+        </section>
+      </div>
+    );
+  }
+
   return (
-    <section className="pg-card profileCard">
-      <div className="profileTop">
-        <img className="profileAvatar" src={profile.avatarUrl} alt="Foto do perfil" />
+    <div className="pg-wrap">
+      <header className="pg-header">
+        <h1 className="pg-title">Perfil</h1>
+      </header>
 
-        <div className="profileInfo">
-          <div className="profileTitleRow">
-            {!isEditing ? (
+      <section className="pg-card profileCard">
+        <div className="profileTop">
+          <img
+            className="profileAvatar"
+            src={profile.avatarUrl || "https://via.placeholder.com/132"}
+            alt="Foto do perfil"
+            referrerPolicy="no-referrer"
+          />
+
+          <div className="profileInfo">
+            <div className="profileTitleRow">
               <h2 className="profileName">{profile.name}</h2>
-            ) : (
-              <input
-                className="profileInput profileInputName"
-                value={draft.name}
-                onChange={onDraft("name")}
-                placeholder="Nome"
-              />
-            )}
 
-            <div className="profileActions">
-              {!isEditing ? (
-                <button type="button" className="profileActionBtn" onClick={startEdit}>
-                  <IconEdit className="profileActionIco" />
-                  Editar perfil
-                </button>
-              ) : (
-                <>
-                  <button type="button" className="profileActionBtn is-primary" onClick={saveEdit}>
-                    <IconSave className="profileActionIco" />
-                    Salvar
+              <div className="profileActions">
+                {!isEditing ? (
+                  <button type="button" className="profileActionBtn" onClick={startEdit}>
+                    <IconEdit className="profileActionIco" />
+                    Editar perfil
                   </button>
-                  <button type="button" className="profileActionBtn is-ghost" onClick={cancelEdit}>
-                    <IconClose className="profileActionIco" />
-                    Cancelar
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="profileMeta">
-            <div className="profileRow">
-              <span className="profileIco" aria-hidden="true">
-                <IconMail />
-              </span>
-
-              {!isEditing ? (
-                <span className="profileText">{profile.email}</span>
-              ) : (
-                <input
-                  className="profileInput"
-                  type="email"
-                  value={draft.email}
-                  onChange={onDraft("email")}
-                  placeholder="Email"
-                />
-              )}
+                ) : (
+                  <>
+                    <button type="button" className="profileActionBtn is-primary" onClick={saveEdit}>
+                      <IconSave className="profileActionIco" />
+                      Salvar
+                    </button>
+                    <button type="button" className="profileActionBtn is-ghost" onClick={cancelEdit}>
+                      <IconClose className="profileActionIco" />
+                      Cancelar
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="profileRow">
-              <span className="profileIco" aria-hidden="true">
-                <IconPin />
-              </span>
+            <div className="profileMeta">
+              <div className="profileRow">
+                <span className="profileIco" aria-hidden="true">
+                  <IconMail />
+                </span>
+                <span className="profileText">{profile.email || "—"}</span>
+              </div>
 
-              {!isEditing ? (
-                <span className="profileText">{profile.address}</span>
-              ) : (
-                <input
-                  className="profileInput"
-                  value={draft.address}
-                  onChange={onDraft("address")}
-                  placeholder="Endereço"
-                />
-              )}
-            </div>
+              <div className="profileRow">
+                <span className="profileIco" aria-hidden="true">
+                  <IconPin />
+                </span>
+                {!isEditing ? (
+                  <span className="profileText">{profile.address}</span>
+                ) : (
+                  <input
+                    className="profileInput"
+                    value={draft.address}
+                    onChange={onDraft("address")}
+                    placeholder="Endereço"
+                  />
+                )}
+              </div>
 
-            <div className="profileRow">
-              <span className="profileIco" aria-hidden="true">
-                <IconHome />
-              </span>
-
-              {!isEditing ? (
-                <span className="profileText">{profile.company}</span>
-              ) : (
-                <input
-                  className="profileInput"
-                  value={draft.company}
-                  onChange={onDraft("company")}
-                  placeholder="Empresa"
-                />
-              )}
+              <div className="profileRow">
+                <span className="profileIco" aria-hidden="true">
+                  <IconHome />
+                </span>
+                {!isEditing ? (
+                  <span className="profileText">{profile.company}</span>
+                ) : (
+                  <input
+                    className="profileInput"
+                    value={draft.company}
+                    onChange={onDraft("company")}
+                    placeholder="Empresa"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="profileDivider" />
+        <div className="profileDivider" />
 
-      <div className="profileSection">
-        <h3 className="profileSectionTitle">Sua Assinatura Atual</h3>
-        <button type="button" className="profilePlanBtn">
-          Plano Premium
-        </button>
-      </div>
+        <div className="profileSection">
+          <h3 className="profileSectionTitle">Sua Assinatura Atual</h3>
+          <button type="button" className="profilePlanBtn">
+            Plano Premium
+          </button>
+        </div>
 
-      <div className="profileUsers">
-        <p className="profileUsersTitle">Usuários na Assinatura:</p>
+        <div className="profileUsers">
+          <p className="profileUsersTitle">Usuários na Assinatura:</p>
 
-        <ul className="profileUsersList">
-          <li className="profileUser">
-            <span className="profileUserIco" aria-hidden="true">
-              <IconUser />
-            </span>
-            <span className="profileUserName">{profile.name}</span>
-            <span className="profileBadge is-you">você</span>
-          </li>
+          <ul className="profileUsersList">
+            <li className="profileUser">
+              <span className="profileUserIco" aria-hidden="true">
+                <IconUser />
+              </span>
+              <span className="profileUserName">{profile.name}</span>
+              <span className="profileBadge is-you">você</span>
+            </li>
 
-          <li className="profileUser">
-            <span className="profileUserIco" aria-hidden="true">
-              <IconUser />
-            </span>
-            <span className="profileUserName">Mariana Lima</span>
-            <span className="profileBadge is-admin">admin</span>
-          </li>
+            <li className="profileUser">
+              <span className="profileUserIco" aria-hidden="true">
+                <IconUser />
+              </span>
+              <span className="profileUserName">Mariana Lima</span>
+              <span className="profileBadge is-admin">admin</span>
+            </li>
 
-          <li className="profileUser">
-            <span className="profileUserIco" aria-hidden="true">
-              <IconUser />
-            </span>
-            <span className="profileUserName">Lucas Pereira</span>
-          </li>
+            <li className="profileUser">
+              <span className="profileUserIco" aria-hidden="true">
+                <IconUser />
+              </span>
+              <span className="profileUserName">Lucas Pereira</span>
+            </li>
 
-          <li className="profileUser">
-            <span className="profileUserIco" aria-hidden="true">
-              <IconUser />
-            </span>
-            <span className="profileUserName">Fernanda Gomes</span>
-          </li>
-        </ul>
-      </div>
-    </section>
+            <li className="profileUser">
+              <span className="profileUserIco" aria-hidden="true">
+                <IconUser />
+              </span>
+              <span className="profileUserName">Fernanda Gomes</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
   );
 }
