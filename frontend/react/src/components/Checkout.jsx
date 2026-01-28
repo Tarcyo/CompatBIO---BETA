@@ -55,7 +55,10 @@ export default function CheckoutConfirmPage({
   const [method, setMethod] = useState(""); // "card" | "boleto"
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const subtotal = useMemo(() => credits * pricePerCredit, [credits, pricePerCredit]);
+  const subtotal = useMemo(
+    () => credits * pricePerCredit,
+    [credits, pricePerCredit]
+  );
 
   const handleConclude = async () => {
     if (!method || credits < 1) return;
@@ -69,140 +72,154 @@ export default function CheckoutConfirmPage({
     }
   };
 
-  // ✅ Cancelar e voltar para Planos
   const handleCancel = () => {
     navigate("/app/planos");
   };
 
   return (
     <div className="pg-wrap">
-      <header className="pg-header">
-        <h1 className="pg-title">Confirmação de Compra</h1>
-      </header>
-
       <section className="pg-card checkoutCard">
-        <div className="checkoutTop">
-          <div className="checkoutTopLeft">
-            <h2 className="checkoutTitle">{planName}</h2>
-            <p className="checkoutSubtitle">Revise os detalhes antes de concluir.</p>
+        {/* ✅ título dentro do card */}
+        <header className="checkoutCardHeader">
+          <div className="checkoutHeaderLeft">
+            <h1 className="checkoutCardTitle">Confirmação de Compra</h1>
+            <p className="checkoutCardSubtitle">
+              Revise os detalhes antes de concluir.
+            </p>
           </div>
 
-          <div className="checkoutTopRight">
+          <div className="checkoutHeaderRight">
             <span className="totalPill">
               <span className="totalPillLabel">Total</span>
               <span className="totalPillValue">{formatBRL(subtotal)}</span>
             </span>
           </div>
-        </div>
+        </header>
 
-        <div className="checkoutDivider" />
+        <div className="checkoutCardBody">
+          <div className="checkoutTop">
+            <div className="checkoutTopLeft">
+              <h2 className="checkoutTitle">{planName}</h2>
+              <p className="checkoutSubtitle">Escolha a forma de pagamento abaixo.</p>
+            </div>
+          </div>
 
-        <div className="summaryGrid">
-          <div className="summaryItem">
-            <span className="summaryLabel">Quantidade de créditos</span>
-            <div className="summaryValueRow">
+          <div className="checkoutDivider" />
+
+          <div className="summaryGrid">
+            <div className="summaryItem">
+              <span className="summaryLabel">Quantidade de créditos</span>
+              <div className="summaryValueRow">
+                <input
+                  className="creditsInput"
+                  type="number"
+                  min={1}
+                  value={credits}
+                  onChange={(e) =>
+                    setCredits(Math.max(1, Number(e.target.value || 1)))
+                  }
+                  aria-label="Quantidade de créditos"
+                />
+                <span className="summaryHint">créditos</span>
+              </div>
+            </div>
+
+            <div className="summaryItem">
+              <span className="summaryLabel">Valor por crédito</span>
+              <span className="summaryValue">{formatBRL(pricePerCredit)}</span>
+            </div>
+
+            <div className="summaryItem is-total">
+              <span className="summaryLabel">Valor total a pagar</span>
+              <span className="summaryValue is-strong">
+                {formatBRL(subtotal)}
+              </span>
+            </div>
+          </div>
+
+          <div className="checkoutDivider" />
+
+          <h3 className="sectionTitle">Selecione a forma de pagamento</h3>
+
+          <div className="payOptions" role="radiogroup" aria-label="Forma de pagamento">
+            <label className={`payOption ${method === "card" ? "is-selected" : ""}`}>
               <input
-                className="creditsInput"
-                type="number"
-                min={1}
-                value={credits}
-                onChange={(e) => setCredits(Math.max(1, Number(e.target.value || 1)))}
-                aria-label="Quantidade de créditos"
+                className="payRadio"
+                type="radio"
+                name="payment"
+                value="card"
+                checked={method === "card"}
+                onChange={() => setMethod("card")}
               />
-              <span className="summaryHint">créditos</span>
-            </div>
-          </div>
-
-          <div className="summaryItem">
-            <span className="summaryLabel">Valor por crédito</span>
-            <span className="summaryValue">{formatBRL(pricePerCredit)}</span>
-          </div>
-
-          <div className="summaryItem is-total">
-            <span className="summaryLabel">Valor total a pagar</span>
-            <span className="summaryValue is-strong">{formatBRL(subtotal)}</span>
-          </div>
-        </div>
-
-        <div className="checkoutDivider" />
-
-        <h3 className="sectionTitle">Selecione a forma de pagamento</h3>
-
-        <div className="payOptions" role="radiogroup" aria-label="Forma de pagamento">
-          <label className={`payOption ${method === "card" ? "is-selected" : ""}`}>
-            <input
-              className="payRadio"
-              type="radio"
-              name="payment"
-              value="card"
-              checked={method === "card"}
-              onChange={() => setMethod("card")}
-            />
-            <div className="payOptionTop">
-              <span className="payIconWrap">
-                <IconCard className="payIcon" />
-              </span>
-              <div className="payTexts">
-                <span className="payTitle">Cartão de Crédito</span>
-                <span className="payDesc">Aprovação rápida. Pague em 1x.</span>
+              <div className="payOptionTop">
+                <span className="payIconWrap">
+                  <IconCard className="payIcon" />
+                </span>
+                <div className="payTexts">
+                  <span className="payTitle">Cartão de Crédito</span>
+                  <span className="payDesc">Aprovação rápida. Pague em 1x.</span>
+                </div>
+                {method === "card" && <IconCheck className="paySelectedIco" />}
               </div>
-              {method === "card" && <IconCheck className="paySelectedIco" />}
-            </div>
-            <div className="payFoot">
-              <span className="payMini">Você será direcionado para inserir os dados do cartão.</span>
-            </div>
-          </label>
-
-          <label className={`payOption ${method === "boleto" ? "is-selected" : ""}`}>
-            <input
-              className="payRadio"
-              type="radio"
-              name="payment"
-              value="boleto"
-              checked={method === "boleto"}
-              onChange={() => setMethod("boleto")}
-            />
-            <div className="payOptionTop">
-              <span className="payIconWrap">
-                <IconBarcode className="payIcon" />
-              </span>
-              <div className="payTexts">
-                <span className="payTitle">Boleto</span>
-                <span className="payDesc">Compensação em até 1–2 dias úteis.</span>
+              <div className="payFoot">
+                <span className="payMini">
+                  Você será direcionado para inserir os dados do cartão.
+                </span>
               </div>
-              {method === "boleto" && <IconCheck className="paySelectedIco" />}
-            </div>
-            <div className="payFoot">
-              <span className="payMini">Geraremos um boleto para pagamento (PDF/código).</span>
-            </div>
-          </label>
-        </div>
+            </label>
 
-        <div className="checkoutDivider" />
-
-        <div className="checkoutActions">
-          <div className="confirmNote">
-            <IconCheck className="confirmNoteIco" />
-            <span>
-              Ao concluir, você confirma a compra de <b>{credits}</b> créditos no valor total de{" "}
-              <b>{formatBRL(subtotal)}</b>.
-            </span>
+            <label className={`payOption ${method === "boleto" ? "is-selected" : ""}`}>
+              <input
+                className="payRadio"
+                type="radio"
+                name="payment"
+                value="boleto"
+                checked={method === "boleto"}
+                onChange={() => setMethod("boleto")}
+              />
+              <div className="payOptionTop">
+                <span className="payIconWrap">
+                  <IconBarcode className="payIcon" />
+                </span>
+                <div className="payTexts">
+                  <span className="payTitle">Boleto</span>
+                  <span className="payDesc">Compensação em até 1–2 dias úteis.</span>
+                </div>
+                {method === "boleto" && <IconCheck className="paySelectedIco" />}
+              </div>
+              <div className="payFoot">
+                <span className="payMini">
+                  Geraremos um boleto para pagamento (PDF/código).
+                </span>
+              </div>
+            </label>
           </div>
 
-          {/* ✅ Botões lado a lado */}
-          <div className="checkoutBtns">
-            <button type="button" className="cancelBtn" onClick={handleCancel}>
-              Cancelar Compra
-            </button>
+          <div className="checkoutDivider" />
 
-            <button
-              type="button"
-              className="concludeBtn"
-              disabled={!method || credits < 1 || isSubmitting}
-              onClick={handleConclude}
-            >
-              {isSubmitting ? "Concluindo..." : "Concluir Compra"}
-            </button>
+          <div className="checkoutActions">
+            <div className="confirmNote">
+              <IconCheck className="confirmNoteIco" />
+              <span>
+                Ao concluir, você confirma a compra de <b>{credits}</b> créditos no valor total de{" "}
+                <b>{formatBRL(subtotal)}</b>.
+              </span>
+            </div>
+
+            <div className="checkoutBtns">
+              <button type="button" className="cancelBtn" onClick={handleCancel}>
+                Cancelar Compra
+              </button>
+
+              <button
+                type="button"
+                className="concludeBtn"
+                disabled={!method || credits < 1 || isSubmitting}
+                onClick={handleConclude}
+              >
+                {isSubmitting ? "Concluindo..." : "Concluir Compra"}
+              </button>
+            </div>
           </div>
         </div>
       </section>

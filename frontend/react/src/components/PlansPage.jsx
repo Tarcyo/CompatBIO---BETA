@@ -67,7 +67,6 @@ function PlanCard({
 
 export default function PlansPage() {
   const navigate = useNavigate();
-
   const PRICE_PER_CREDIT = 2.0;
 
   const plans = useMemo(
@@ -123,7 +122,6 @@ export default function PlansPage() {
     console.log("Escolher plano:", id);
   };
 
-  // ✅ AGORA REDIRECIONA
   const handleBuyCredits = () => {
     navigate("/app/confirmar-compra", {
       state: {
@@ -135,101 +133,110 @@ export default function PlansPage() {
 
   return (
     <div className="pg-wrap">
-      <header className="pg-header">
-        <h1 className="pg-title">Planos e Créditos</h1>
-      </header>
-
       <section className="pg-card plansCard">
-        <h3 className="plansSectionTitle">Seu Plano Atual</h3>
+        {/* ✅ título dentro do card */}
+        <header className="plansCardHeader">
+          <h1 className="plansCardTitle">Planos e Créditos</h1>
+        </header>
 
-        <div className="currentPlan">
-          <div className="currentPlanLeft">
-            <h4 className="currentPlanTitle">{plans.current.name}</h4>
-            <ul className="currentPlanList">
-              {plans.current.features.map((t) => (
-                <li key={t} className="currentPlanItem">
-                  <IconCheckCircle className="currentPlanCheck" />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="plansCardBody">
+          <h3 className="plansSectionTitle">Seu Plano Atual</h3>
+
+          <div className="currentPlan">
+            <div className="currentPlanLeft">
+              <h4 className="currentPlanTitle">{plans.current.name}</h4>
+              <ul className="currentPlanList">
+                {plans.current.features.map((t) => (
+                  <li key={t} className="currentPlanItem">
+                    <IconCheckCircle className="currentPlanCheck" />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="currentPlanRight">
+              <button
+                type="button"
+                className="chooseBtn is-blue"
+                onClick={() => handleChoose("current_change")}
+              >
+                Escolher Plano
+              </button>
+            </div>
           </div>
 
-          <div className="currentPlanRight">
-            <button
-              type="button"
-              className="chooseBtn is-blue"
-              onClick={() => handleChoose("current_change")}
-            >
-              Escolher Plano
+          <div className="plansDivider" />
+
+          <div className="plansCols">
+            <div className="plansCol">
+              <h3 className="plansGroupTitle">
+                Planos Recomendados para Pessoas Físicas
+              </h3>
+
+              <div className="plansGrid">
+                {plans.pf.map((p) => (
+                  <PlanCard
+                    key={p.id}
+                    title={p.title}
+                    price={p.price}
+                    features={p.features}
+                    ctaLabel={p.cta}
+                    variant={p.variant}
+                    onCta={() => handleChoose(p.id)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="plansCol is-right">
+              <h3 className="plansGroupTitle">
+                Planos Recomendados para Pessoas Jurídicas
+              </h3>
+
+              <div className="plansGrid">
+                {plans.pj.map((p) => (
+                  <PlanCard
+                    key={p.id}
+                    title={p.title}
+                    price={p.price}
+                    badge={p.badge}
+                    features={p.features}
+                    ctaLabel={p.cta}
+                    variant={p.variant}
+                    onCta={() => handleChoose(p.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="plansDivider" />
+
+          <h3 className="plansSectionTitle">Comprar Créditos Avulsos</h3>
+
+          <p className="creditsLabel">Quantos créditos você deseja comprar?</p>
+
+          <div className="creditsRow">
+            <input
+              className="creditsInput"
+              type="number"
+              min={1}
+              value={credits}
+              onChange={(e) =>
+                setCredits(Math.max(1, Number(e.target.value || 1)))
+              }
+              aria-label="Quantidade de créditos"
+            />
+
+            <button type="button" className="buyBtn is-green" onClick={handleBuyCredits}>
+              <IconCheckCircle className="buyBtnIco" />
+              Comprar Créditos
             </button>
           </div>
+
+          <small className="creditsHint">R$2,00 por crédito</small>
         </div>
-
-        <div className="plansDivider" />
-
-        <div className="plansCols">
-          <div className="plansCol">
-            <h3 className="plansGroupTitle">Planos Recomendados para Pessoas Físicas</h3>
-
-            <div className="plansGrid">
-              {plans.pf.map((p) => (
-                <PlanCard
-                  key={p.id}
-                  title={p.title}
-                  price={p.price}
-                  features={p.features}
-                  ctaLabel={p.cta}
-                  variant={p.variant}
-                  onCta={() => handleChoose(p.id)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="plansCol is-right">
-            <h3 className="plansGroupTitle">Planos Recomendados para Pessoas Jurídicas</h3>
-
-            <div className="plansGrid">
-              {plans.pj.map((p) => (
-                <PlanCard
-                  key={p.id}
-                  title={p.title}
-                  price={p.price}
-                  badge={p.badge}
-                  features={p.features}
-                  ctaLabel={p.cta}
-                  variant={p.variant}
-                  onCta={() => handleChoose(p.id)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="plansDivider" />
-
-        <h3 className="plansSectionTitle">Comprar Créditos Avulsos</h3>
-
-        <p className="creditsLabel">Quantos créditos você deseja comprar?</p>
-
-        <div className="creditsRow">
-          <input
-            className="creditsInput"
-            type="number"
-            min={1}
-            value={credits}
-            onChange={(e) => setCredits(Math.max(1, Number(e.target.value || 1)))}
-            aria-label="Quantidade de créditos"
-          />
-
-          <button type="button" className="buyBtn is-green" onClick={handleBuyCredits}>
-            <IconCheckCircle className="buyBtnIco" />
-            Comprar Créditos
-          </button>
-        </div>
-
-        <small className="creditsHint">R$2,00 por crédito</small>
       </section>
     </div>
   );

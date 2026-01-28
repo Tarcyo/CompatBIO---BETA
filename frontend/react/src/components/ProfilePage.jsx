@@ -74,6 +74,18 @@ function IconUser(props) {
   );
 }
 
+/* ícone de moedas (para o "Créditos disponíveis") */
+function IconCoins(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        fill="currentColor"
+        d="M12 3C7.58 3 4 4.34 4 6s3.58 3 8 3 8-1.34 8-3-3.58-3-8-3Zm0 8c-4.42 0-8-1.34-8-3v4c0 1.66 3.58 3 8 3s8-1.34 8-3V8c0 1.66-3.58 3-8 3Zm0 6c-4.42 0-8-1.34-8-3v4c0 1.66 3.58 3 8 3s8-1.34 8-3v-4c0 1.66-3.58 3-8 3Z"
+      />
+    </svg>
+  );
+}
+
 export default function ProfilePage() {
   const API_BASE = (import.meta?.env?.VITE_API_URL || "http://localhost:3000")
     .toString()
@@ -128,6 +140,23 @@ export default function ProfilePage() {
     };
   }, [API_BASE]);
 
+  // tenta capturar créditos de alguns nomes comuns (ajuste se seu backend usar outro)
+  const creditsNumber = useMemo(() => {
+    const raw =
+      googleUser?.credits ??
+      googleUser?.creditos ??
+      googleUser?.credit_balance ??
+      googleUser?.creditBalance ??
+      googleUser?.balance ??
+      googleUser?.quota ??
+      null;
+
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  }, [googleUser]);
+
+  const formatCredits = useMemo(() => new Intl.NumberFormat("pt-BR"), []);
+
   const profile = useMemo(() => {
     return {
       name: googleUser?.name || "",
@@ -135,8 +164,9 @@ export default function ProfilePage() {
       avatarUrl: googleUser?.picture || "",
       address: appFields.address || "—",
       company: appFields.company || "—",
+      credits: creditsNumber,
     };
-  }, [googleUser, appFields]);
+  }, [googleUser, appFields, creditsNumber]);
 
   const startEdit = () => {
     setDraft({ ...appFields });
@@ -160,16 +190,20 @@ export default function ProfilePage() {
     } catch {}
   };
 
-  const onDraft = (key) => (e) => setDraft((p) => ({ ...p, [key]: e.target.value }));
+  const onDraft = (key) => (e) =>
+    setDraft((p) => ({ ...p, [key]: e.target.value }));
 
   if (loadingUser) {
     return (
       <div className="pg-wrap">
-        <header className="pg-header">
-          <h1 className="pg-title">Perfil</h1>
-        </header>
         <section className="pg-card profileCard">
-          <p className="profileText">Carregando dados do Google...</p>
+          <header className="profileCardHeader">
+            <h1 className="profileCardTitle">Perfil</h1>
+          </header>
+
+          <div className="profileCardBody">
+            <p className="profileText">Carregando dados do Google...</p>
+          </div>
         </section>
       </div>
     );
@@ -178,16 +212,19 @@ export default function ProfilePage() {
   if (!googleUser) {
     return (
       <div className="pg-wrap">
-        <header className="pg-header">
-          <h1 className="pg-title">Perfil</h1>
-        </header>
         <section className="pg-card profileCard">
-          <p className="profileText">
-            Não autenticado. Faça login com Google novamente.
-          </p>
-          <pre className="profileText" style={{ opacity: 0.8 }}>
-            GET {API_BASE}/me retornou 401/erro
-          </pre>
+          <header className="profileCardHeader">
+            <h1 className="profileCardTitle">Perfil</h1>
+          </header>
+
+          <div className="profileCardBody">
+            <p className="profileText">
+              Não autenticado. Faça login com Google novamente.
+            </p>
+            <pre className="profileText" style={{ opacity: 0.8 }}>
+              GET {API_BASE}/me retornou 401/erro
+            </pre>
+          </div>
         </section>
       </div>
     );
@@ -195,130 +232,169 @@ export default function ProfilePage() {
 
   return (
     <div className="pg-wrap">
-      <header className="pg-header">
-        <h1 className="pg-title">Perfil</h1>
-      </header>
-
       <section className="pg-card profileCard">
-        <div className="profileTop">
-          <img
-            className="profileAvatar"
-            src={profile.avatarUrl || "https://via.placeholder.com/132"}
-            alt="Foto do perfil"
-            referrerPolicy="no-referrer"
-          />
+        <header className="profileCardHeader">
+          <h1 className="profileCardTitle">Perfil</h1>
+        </header>
 
-          <div className="profileInfo">
-            <div className="profileTitleRow">
-              <h2 className="profileName">{profile.name}</h2>
+        <div className="profileCardBody">
+          <div className="profileTop">
+            <img
+              className="profileAvatar"
+              src={profile.avatarUrl || "https://via.placeholder.com/132"}
+              alt="Foto do perfil"
+              referrerPolicy="no-referrer"
+            />
 
-              <div className="profileActions">
-                {!isEditing ? (
-                  <button type="button" className="profileActionBtn" onClick={startEdit}>
-                    <IconEdit className="profileActionIco" />
-                    Editar perfil
-                  </button>
-                ) : (
-                  <>
-                    <button type="button" className="profileActionBtn is-primary" onClick={saveEdit}>
-                      <IconSave className="profileActionIco" />
-                      Salvar
+            <div className="profileInfo">
+              <div className="profileTitleRow">
+                <h2 className="profileName">{profile.name}</h2>
+
+                <div className="profileActions">
+                  {!isEditing ? (
+                    <button
+                      type="button"
+                      className="profileActionBtn"
+                      onClick={startEdit}
+                    >
+                      <IconEdit className="profileActionIco" />
+                      Editar perfil
                     </button>
-                    <button type="button" className="profileActionBtn is-ghost" onClick={cancelEdit}>
-                      <IconClose className="profileActionIco" />
-                      Cancelar
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="profileMeta">
-              <div className="profileRow">
-                <span className="profileIco" aria-hidden="true">
-                  <IconMail />
-                </span>
-                <span className="profileText">{profile.email || "—"}</span>
-              </div>
-
-              <div className="profileRow">
-                <span className="profileIco" aria-hidden="true">
-                  <IconPin />
-                </span>
-                {!isEditing ? (
-                  <span className="profileText">{profile.address}</span>
-                ) : (
-                  <input
-                    className="profileInput"
-                    value={draft.address}
-                    onChange={onDraft("address")}
-                    placeholder="Endereço"
-                  />
-                )}
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="profileActionBtn is-primary"
+                        onClick={saveEdit}
+                      >
+                        <IconSave className="profileActionIco" />
+                        Salvar
+                      </button>
+                      <button
+                        type="button"
+                        className="profileActionBtn is-ghost"
+                        onClick={cancelEdit}
+                      >
+                        <IconClose className="profileActionIco" />
+                        Cancelar
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
-              <div className="profileRow">
-                <span className="profileIco" aria-hidden="true">
-                  <IconHome />
-                </span>
-                {!isEditing ? (
-                  <span className="profileText">{profile.company}</span>
-                ) : (
-                  <input
-                    className="profileInput"
-                    value={draft.company}
-                    onChange={onDraft("company")}
-                    placeholder="Empresa"
-                  />
-                )}
+              <div className="profileMeta">
+                <div className="profileRow">
+                  <span className="profileIco" aria-hidden="true">
+                    <IconMail />
+                  </span>
+                  <span className="profileText">{profile.email || "—"}</span>
+                </div>
+
+                <div className="profileRow">
+                  <span className="profileIco" aria-hidden="true">
+                    <IconPin />
+                  </span>
+                  {!isEditing ? (
+                    <span className="profileText">{profile.address}</span>
+                  ) : (
+                    <input
+                      className="profileInput"
+                      value={draft.address}
+                      onChange={onDraft("address")}
+                      placeholder="Endereço"
+                    />
+                  )}
+                </div>
+
+                <div className="profileRow">
+                  <span className="profileIco" aria-hidden="true">
+                    <IconHome />
+                  </span>
+                  {!isEditing ? (
+                    <span className="profileText">{profile.company}</span>
+                  ) : (
+                    <input
+                      className="profileInput"
+                      value={draft.company}
+                      onChange={onDraft("company")}
+                      placeholder="Empresa"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="profileDivider" />
+          <div className="profileDivider" />
 
-        <div className="profileSection">
-          <h3 className="profileSectionTitle">Sua Assinatura Atual</h3>
-          <button type="button" className="profilePlanBtn">
-            Plano Premium
-          </button>
-        </div>
+          <div className="profileSection">
+            <h3 className="profileSectionTitle">Sua Assinatura Atual:</h3>
 
-        <div className="profileUsers">
-          <p className="profileUsersTitle">Usuários na Assinatura:</p>
+            <div className="profilePlanRow">
+              <button type="button" className="profilePlanBtn">
+                Plano Premium
+              </button>
 
-          <ul className="profileUsersList">
-            <li className="profileUser">
-              <span className="profileUserIco" aria-hidden="true">
-                <IconUser />
-              </span>
-              <span className="profileUserName">{profile.name}</span>
-              <span className="profileBadge is-you">você</span>
-            </li>
+              <div
+                className="profileCreditsCard"
+                role="status"
+                aria-label="Créditos disponíveis"
+                title="Créditos disponíveis na sua conta"
+              >
+                <div className="profileCreditsRow">
+                  <span className="profileCreditsLabelInline">
+                    Créditos disponíveis
+                  </span>
 
-            <li className="profileUser">
-              <span className="profileUserIco" aria-hidden="true">
-                <IconUser />
-              </span>
-              <span className="profileUserName">Mariana Lima</span>
-              <span className="profileBadge is-admin">admin</span>
-            </li>
+                  <span className="profileCreditsStat">
+                    <IconCoins className="profileCreditsIcon" />
+                    <span className="profileCreditsNumber">
+                      {profile.credits == null
+                        ? "—"
+                        : formatCredits.format(profile.credits)}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <li className="profileUser">
-              <span className="profileUserIco" aria-hidden="true">
-                <IconUser />
-              </span>
-              <span className="profileUserName">Lucas Pereira</span>
-            </li>
+          <div className="profileUsers">
+            <p className="profileUsersTitle">Usuários na Assinatura:</p>
 
-            <li className="profileUser">
-              <span className="profileUserIco" aria-hidden="true">
-                <IconUser />
-              </span>
-              <span className="profileUserName">Fernanda Gomes</span>
-            </li>
-          </ul>
+            <ul className="profileUsersList">
+              <li className="profileUser">
+                <span className="profileUserIco" aria-hidden="true">
+                  <IconUser />
+                </span>
+                <span className="profileUserName">{profile.name}</span>
+                <span className="profileBadge is-you">você</span>
+              </li>
+
+              <li className="profileUser">
+                <span className="profileUserIco" aria-hidden="true">
+                  <IconUser />
+                </span>
+                <span className="profileUserName">Mariana Lima</span>
+                <span className="profileBadge is-admin">admin</span>
+              </li>
+
+              <li className="profileUser">
+                <span className="profileUserIco" aria-hidden="true">
+                  <IconUser />
+                </span>
+                <span className="profileUserName">Lucas Pereira</span>
+              </li>
+
+              <li className="profileUser">
+                <span className="profileUserIco" aria-hidden="true">
+                  <IconUser />
+                </span>
+                <span className="profileUserName">Fernanda Gomes</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
     </div>

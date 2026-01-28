@@ -1,5 +1,5 @@
 // RequestAnalysisPage.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import "./Pages.css";
 import "./RequestAnalysis.css";
 
@@ -41,15 +41,13 @@ export default function RequestAnalysisPage() {
   const [biological, setBiological] = useState("");
   const creditsAvailable = 12;
 
+  const formatCredits = useMemo(() => new Intl.NumberFormat("pt-BR"), []);
   const cardRef = useRef(null);
 
-  // ✅ garante o "pulinho" SEMPRE (reinicia a animação no mount)
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
-
     el.classList.remove("pg-enter");
-    // força reflow pra reiniciar animation
     void el.offsetHeight;
     el.classList.add("pg-enter");
   }, []);
@@ -65,71 +63,91 @@ export default function RequestAnalysisPage() {
 
   return (
     <div className="pg-wrap">
-      <header className="pg-header">
-        <h1 className="pg-title">Solicitar Análise</h1>
-      </header>
-
       <div className="analysisPage">
-        {/* ✅ mesmo "tipo" de card das outras telas (sem card externo) */}
         <form ref={cardRef} className="pg-card requestCard" onSubmit={submit}>
-          <div className="requestGroup">
-            <h2 className="requestTitle">Produto Químico</h2>
+          <header className="requestCardHeader">
+            <h1 className="requestCardTitle">Solicitar Análise</h1>
 
-            <div className="requestSearch">
-              <span className="requestSearchIco" aria-hidden="true">
-                <IconSearch />
-              </span>
+            {/* ✅ créditos no mesmo estilo premium do Perfil */}
+            <div
+              className="requestCreditsCard"
+              role="status"
+              aria-label="Créditos disponíveis"
+              title="Créditos disponíveis na sua conta"
+            >
+              <div className="requestCreditsRow">
+                <span className="requestCreditsLabelInline">
+                  Créditos disponíveis
+                </span>
 
-              <input
-                className="requestInput"
-                value={chemical}
-                onChange={(e) => setChemical(e.target.value)}
-                placeholder="Buscar produto químico..."
-                autoComplete="off"
-              />
+                <span className="requestCreditsStat">
+                  <IconCredits className="requestCreditsIcon" />
+                  <strong className="requestCreditsValue">
+                    {formatCredits.format(creditsAvailable)}
+                  </strong>
+                </span>
+              </div>
             </div>
-          </div>
+          </header>
 
-          <div className="requestGroup">
-            <h2 className="requestTitle">Produto Biológico</h2>
+          <div className="requestCardBody">
+            <div className="requestGroup">
+              <h2 className="requestTitle">Produto Químico</h2>
 
-            <div className="requestSearch">
-              <span className="requestSearchIco" aria-hidden="true">
-                <IconSearch />
-              </span>
+              <div className="requestSearch">
+                <span className="requestSearchIco" aria-hidden="true">
+                  <IconSearch />
+                </span>
 
-              <input
-                className="requestInput"
-                value={biological}
-                onChange={(e) => setBiological(e.target.value)}
-                placeholder="Buscar produto biológico..."
-                autoComplete="off"
-              />
+                <input
+                  className="requestInput"
+                  value={chemical}
+                  onChange={(e) => setChemical(e.target.value)}
+                  placeholder="Buscar produto químico..."
+                  autoComplete="off"
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="requestHelpRow">
-            <button type="button" className="requestHelpBtn" onClick={requestMissingProduct}>
-              <span className="requestHelpText">Não encontrou o produto? Enviar solicitação!</span>
+            <div className="requestGroup">
+              <h2 className="requestTitle">Produto Biológico</h2>
 
-              <span className="requestHelpIcoWrap" aria-hidden="true">
-                <IconMail className="requestHelpIco" />
-              </span>
-            </button>
-          </div>
+              <div className="requestSearch">
+                <span className="requestSearchIco" aria-hidden="true">
+                  <IconSearch />
+                </span>
 
-          <div className="requestActions">
-            <button type="submit" className="requestMainBtn">
-              Solicitar Análise
-            </button>
-          </div>
+                <input
+                  className="requestInput"
+                  value={biological}
+                  onChange={(e) => setBiological(e.target.value)}
+                  placeholder="Buscar produto biológico..."
+                  autoComplete="off"
+                />
+              </div>
+            </div>
 
-          <div className="requestCredits">
-            <span className="requestCreditsLabel">Créditos disponíveis:</span>
-            <span className="requestCreditsIco" aria-hidden="true">
-              <IconCredits />
-            </span>
-            <strong className="requestCreditsValue">{creditsAvailable}</strong>
+            <div className="requestHelpRow">
+              <button
+                type="button"
+                className="requestHelpBtn"
+                onClick={requestMissingProduct}
+              >
+                <span className="requestHelpText">
+                  Não encontrou o produto? Enviar solicitação!
+                </span>
+
+                <span className="requestHelpIcoWrap" aria-hidden="true">
+                  <IconMail className="requestHelpIco" />
+                </span>
+              </button>
+            </div>
+
+            <div className="requestActions">
+              <button type="submit" className="requestMainBtn">
+                Solicitar Análise
+              </button>
+            </div>
           </div>
         </form>
       </div>

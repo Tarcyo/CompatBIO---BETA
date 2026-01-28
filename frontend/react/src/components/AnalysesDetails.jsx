@@ -37,82 +37,81 @@ export default function AnalysisDetailsPage() {
     console.log("Detalhar análise...");
   };
 
-  // ✅ volta para a rota anterior (histórico)
   const handleBack = () => {
     navigate(-1);
   };
 
   return (
     <div className="pg-wrap">
-      <header className="pg-header">
-        <h1 className="pg-title">Detalhes da Análise</h1>
-      </header>
-
       <div className="analysisDetailsPage">
-        <div className="detailsMeta">{dateText}</div>
-
         <section
           ref={cardRef}
           className="pg-card detailsCard"
           aria-label="Detalhes da análise"
         >
-          {/* Topo (Produtos + Status) */}
-          <div className="detailsTop">
-            <div className="detailsBlock">
-              <div className="detailsLabel">Produto Químico</div>
-              <div className="detailsValue">{chemical}</div>
+          {/* ✅ Header dentro do card */}
+          <header className="detailsCardHeader">
+            <div className="detailsHeaderLeft">
+              <h1 className="detailsCardTitle">Detalhes da Análise</h1>
+              <div className="detailsMeta">{dateText}</div>
             </div>
 
-            <div className="detailsArrow" aria-hidden="true">
-              →
-            </div>
-
-            <div className="detailsMid">
-              <span className="detailsBadge detailsBadgeOk">{status}</span>
-            </div>
-
-            <div className="detailsBlock">
-              <div className="detailsLabel">Produto Biológico</div>
-              <div className="detailsValue">{biological}</div>
-            </div>
-
-            <button
-              type="button"
-              className="detailsMiniBtn"
-              onClick={handleDetail}
-            >
+            <button type="button" className="detailsMiniBtn" onClick={handleDetail}>
               Detalhar Análise
             </button>
-          </div>
+          </header>
 
-          {/* Conteúdo */}
-          <div className="detailsBody">
-            <div className="detailsStatusRow">
-              <span className="detailsStatusIcon" aria-hidden="true">
-                <IconCheckCircle />
-              </span>
+          <div className="detailsCardBody">
+            {/* Topo (Produtos + Status) */}
+            <div className="detailsTop">
+              <div className="detailsBlock">
+                <div className="detailsLabel">Produto Químico</div>
+                <div className="detailsValue" title={chemical}>
+                  {chemical}
+                </div>
+              </div>
 
-              <h2 className="detailsStatusTitle">{status}</h2>
+              <div className="detailsArrow" aria-hidden="true">
+                →
+              </div>
+
+              <div className="detailsMid">
+                <span className="detailsBadge detailsBadgeOk">{status}</span>
+              </div>
+
+              <div className="detailsBlock">
+                <div className="detailsLabel">Produto Biológico</div>
+                <div className="detailsValue" title={biological}>
+                  {biological}
+                </div>
+              </div>
             </div>
 
-            <p className="detailsText">
-              De acordo com a análise realizada, o produto químico{" "}
-              <strong>{chemical}</strong> e o produto biológico{" "}
-              <strong>{biological}</strong> são considerados compatíveis. Isso
-              significa que, sob as condições avaliadas, o uso do bacilo{" "}
-              <strong>{biological}</strong> junto ao herbicida{" "}
-              <strong>{chemical}</strong> não deve gerar efeitos negativos na
-              proteção biológica de seu controle.
-            </p>
+            {/* Conteúdo */}
+            <div className="detailsBody">
+              <div className="detailsStatusRow">
+                <span className="detailsStatusIcon" aria-hidden="true">
+                  <IconCheckCircle />
+                </span>
 
-            <div className="detailsActions">
-              <button
-                type="button"
-                className="detailsBackBtn"
-                onClick={handleBack}
-              >
-                Voltar para Resultados
-              </button>
+                <h2 className="detailsStatusTitle">{status}</h2>
+              </div>
+
+              <p className="detailsText">
+                De acordo com a análise realizada, o produto químico{" "}
+                <strong>{chemical}</strong> e o produto biológico{" "}
+                <strong>{biological}</strong> são considerados compatíveis. Isso
+                significa que, sob as condições avaliadas, o uso do bacilo{" "}
+                <strong>{biological}</strong> junto ao herbicida{" "}
+                <strong>{chemical}</strong> não deve gerar efeitos negativos na
+                proteção biológica de seu controle.
+              </p>
+
+              <div className="detailsActions">
+                <button type="button" className="detailsBackBtn" onClick={handleBack}>
+                  Voltar para Resultados
+                </button>
+              </div>
             </div>
           </div>
         </section>

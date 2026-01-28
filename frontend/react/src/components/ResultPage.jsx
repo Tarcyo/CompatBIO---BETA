@@ -37,65 +37,120 @@ export default function Result() {
 
   const rows = useMemo(
     () => [
-      { date: "18/04/2024", chemical: "Glifosato", biological: "Bacillus cereus Sp.", status: "compatible" },
-      { date: "16/04/2024", chemical: "Metomil", biological: "Trichoderma harz.", status: "incompatible" },
-      { date: "12/04/2024", chemical: "Acefato", biological: "Bacillus cereus Sp.", status: "compatible" },
-      { date: "07/04/2024", chemical: "Glifosato", biological: "Trichoderma spp.", status: "analyzing" },
-      { date: "02/04/2024", chemical: "Glifosato", biological: "Trichoderma spp.", status: "analyzing" },
-      { date: "22/03/2024", chemical: "Clorpirifós", biological: "Paecilomyces lilacinus", status: "incompatible" },
-      { date: "22/03/2024", chemical: "Clorpirifós", biological: "Paecilomyces lilacinus", status: "incompatible" },
+      {
+        date: "18/04/2024",
+        chemical: "Glifosato",
+        biological: "Bacillus cereus Sp.",
+        status: "compatible",
+      },
+      {
+        date: "16/04/2024",
+        chemical: "Metomil",
+        biological: "Trichoderma harz.",
+        status: "incompatible",
+      },
+      {
+        date: "12/04/2024",
+        chemical: "Acefato",
+        biological: "Bacillus cereus Sp.",
+        status: "compatible",
+      },
+      {
+        date: "07/04/2024",
+        chemical: "Glifosato",
+        biological: "Trichoderma spp.",
+        status: "analyzing",
+      },
+      {
+        date: "02/04/2024",
+        chemical: "Glifosato",
+        biological: "Trichoderma spp.",
+        status: "analyzing",
+      },
+      {
+        date: "22/03/2024",
+        chemical: "Clorpirifós",
+        biological: "Paecilomyces lilacinus",
+        status: "incompatible",
+      },
+      {
+        date: "22/03/2024",
+        chemical: "Clorpirifós",
+        biological: "Paecilomyces lilacinus",
+        status: "incompatible",
+      },
     ],
     []
   );
 
   const onDetail = (item) => {
     console.log("Detalhar:", item);
-    // ✅ redireciona para a rota criada
     navigate("/app/detalhes-analise");
   };
 
   return (
     <div className="pg-wrap">
-      <header className="pg-header">
-        <h1 className="pg-title">Resultados das Análises</h1>
-      </header>
+      <div className="resultsPage">
+        <section className="pg-card resultsCard">
+          {/* ✅ TÍTULO DENTRO DO CARD */}
+          <header className="resultsCardHeader">
+            <h1 className="resultsCardTitle">Resultados das Análises</h1>
+          </header>
 
-      <section className="pg-card resultsCard">
-        <ul className="resultsList">
-          {rows.map((r, idx) => {
-            const meta = STATUS_META[r.status] ?? STATUS_META.analyzing;
+          <div className="resultsCardBody">
+            <ul className="resultsList">
+              {rows.map((r, idx) => {
+                const meta = STATUS_META[r.status] ?? STATUS_META.analyzing;
 
-            return (
-              <li key={`${r.date}-${r.chemical}-${idx}`} className="resultsRow">
-                <span className="resultsDate">{r.date}</span>
+                return (
+                  <li key={`${r.date}-${r.chemical}-${idx}`} className="resultsRow">
+                    <span className="resultsDate">{r.date}</span>
 
-                <span className="resultsName resultsName--left" title={r.chemical}>
-                  {r.chemical}
-                </span>
+                    <span
+                      className="resultsName resultsName--left"
+                      title={r.chemical}
+                    >
+                      {r.chemical}
+                    </span>
 
-                <span className="resultsArrow" aria-hidden="true">
-                  <IconArrow />
-                </span>
+                    <span className="resultsArrow" aria-hidden="true">
+                      <IconArrow />
+                    </span>
 
-                <span className="resultsName resultsName--right" title={r.biological}>
-                  {r.biological}
-                </span>
+                    <span
+                      className="resultsName resultsName--right"
+                      title={r.biological}
+                    >
+                      {r.biological}
+                    </span>
 
-                <span className={`resultsStatus ${meta.cls}`}>{meta.label}</span>
+                    <span className={`resultsStatus ${meta.cls}`}>
+                      {meta.label}
+                    </span>
 
-                <button type="button" className="resultsDetailBtn" onClick={() => onDetail(r)}>
-                  Detalhar Análise
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                    <button
+                      type="button"
+                      className="resultsDetailBtn"
+                      onClick={() => onDetail(r)}
+                    >
+                      Detalhar Análise
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
 
-        {/* “scroll hint” igual ao print (opcional) */}
-        <button type="button" className="resultsScrollHint" aria-label="Mais resultados">
-          <IconChevronRight />
-        </button>
-      </section>
+            {/* “scroll hint” (opcional) */}
+            <button
+              type="button"
+              className="resultsScrollHint"
+              aria-label="Mais resultados"
+            >
+              <IconChevronRight />
+            </button>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

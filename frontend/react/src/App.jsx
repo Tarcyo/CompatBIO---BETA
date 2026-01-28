@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import CompatBioLogin from "./components/CompatBioLogin";
 import DashboardLayout from "./components/DashboardLayout";
@@ -12,21 +12,36 @@ import AnalysisDetailsPage from "./components/AnalysesDetails";
 import CheckoutConfirmPage from "./components/Checkout";
 
 import RequireAuth from "./auth/RequireAuth";
+import { useAuth } from "./auth/AuthContext";
+
+function LoginRoute() {
+  const { isAuthenticated, authReady } = useAuth();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/app";
+
+  // enquanto valida sessão, evita piscar/trocar rota
+  if (!authReady) return null;
+
+  // se já autenticado, não deixa ficar no /login
+  if (isAuthenticated) return <Navigate to={from} replace />;
+
+  return <CompatBioLogin />;
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* LOGIN */}
-        <Route path="/" element={<CompatBioLogin />} />
+        {/* ÚNICA rota pública */}
+        <Route path="/login" element={<LoginRoute />} />
 
-        {/* ÁREA PROTEGIDA */}
+        {/* TUDO o resto protegido */}
         <Route element={<RequireAuth />}>
-          <Route path="/app" element={<DashboardLayout />}>
-            {/* ao acessar /app, redireciona para /app/perfil */}
-            <Route index element={<Navigate to="perfil" replace />} />
+          <Route path="/" element={<Navigate to="/app" replace />} />
 
-            {/* rotas internas */}
+          <Route path="/app" element={<DashboardLayout />}>
+            <Route index element={<Navigate to="perfil" replace />} />
             <Route path="perfil" element={<ProfilePage />} />
             <Route path="solicitar-analise" element={<RequestAnalysisPage />} />
             <Route path="resultados" element={<ResultsPage />} />
@@ -34,10 +49,10 @@ export default function App() {
             <Route path="planos" element={<PlansCreditsPage />} />
             <Route path="confirmar-compra" element={<CheckoutConfirmPage />} />
           </Route>
-        </Route>
 
-        {/* fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+          {/* qualquer rota errada protegida cai no app */}
+          <Route path="*" element={<Navigate to="/app" replace />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

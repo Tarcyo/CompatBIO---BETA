@@ -1,34 +1,42 @@
-/* CheckoutConfirm.css */
+/* Checkout.css (COMPLETO — mesmo padrão do Perfil + tudo maior + título no card) */
 
 /* =========================
-   CARD PRINCIPAL (mesmo molde glass)
+   CARD PRINCIPAL (IGUAL AO PERFIL) ✅
 ========================= */
 .checkoutCard {
-  width: min(980px, 100%);
-  padding: 28px 30px 26px;
-  border-radius: 12px;
+  --surface-0: rgba(22, 30, 40, 0.72);
+  --surface-1: rgba(22, 30, 40, 0.72);
 
-  background: linear-gradient(
-    180deg,
-    rgba(26, 38, 54, 0.48) 0%,
-    rgba(16, 24, 36, 0.42) 100%
-  );
+  --border-0: rgba(255, 255, 255, 0.16);
+  --text-0: rgba(255, 255, 255, 0.96);
+  --text-1: rgba(255, 255, 255, 0.88);
 
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  --shadow-lg: 0 34px 90px rgba(0, 0, 0, 0.42);
+  --shadow-md: 0 18px 44px rgba(0, 0, 0, 0.34);
+
+  --r-lg: 18px;
+  --r-sm: 14px;
+
+  width: min(1240px, 100%);
+  min-height: 680px;
+
+  padding: 52px 56px 48px;
+  border-radius: var(--r-lg);
+
+  background: linear-gradient(180deg, var(--surface-0) 0%, var(--surface-1) 100%);
+  border: 1px solid var(--border-0);
 
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 
-  box-shadow:
-    0 34px 90px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.10);
 
-  color: rgba(255, 255, 255, 0.94);
+  color: var(--text-0);
   position: relative;
   overflow: hidden;
 }
 
-/* brilho sutil */
+/* brilho sutil (igual ao Perfil) */
 .checkoutCard::before {
   content: "";
   position: absolute;
@@ -36,15 +44,15 @@
   pointer-events: none;
   border-radius: inherit;
   background: radial-gradient(
-    700px 260px at 24% 18%,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.00) 55%
+    900px 340px at 22% 18%,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.06) 26%,
+    rgba(255, 255, 255, 0.00) 56%
   );
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
-/* camada de profundidade */
+/* profundidade (igual ao Perfil) */
 .checkoutCard::after {
   content: "";
   position: absolute;
@@ -54,10 +62,10 @@
   background: linear-gradient(
     120deg,
     rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.00) 42%,
+    rgba(255, 255, 255, 0.00) 44%,
     rgba(255, 255, 255, 0.04) 100%
   );
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 /* conteúdo acima dos efeitos */
@@ -66,80 +74,126 @@
   z-index: 1;
 }
 
+/* =========================
+   HEADER (TÍTULO NO CARD) ✅
+========================= */
+.checkoutCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+
+  margin: 0 0 28px;
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.checkoutHeaderLeft {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.checkoutCardTitle {
+  margin: 0;
+  font-size: clamp(30px, 3.6vw, 42px);
+  font-weight: 1000;
+  letter-spacing: 0.2px;
+  line-height: 1.08;
+  color: var(--text-0);
+  text-shadow: 0 14px 34px rgba(0, 0, 0, 0.40);
+}
+
+.checkoutCardSubtitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.74);
+  text-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+}
+
+.checkoutCardBody {
+  display: block;
+}
+
 .checkoutDivider {
-  margin: 18px 0;
+  margin: 26px 0;
   height: 1px;
   background: rgba(255, 255, 255, 0.18);
 }
 
 /* =========================
-   TOPO
+   TOPO INTERNO
 ========================= */
 .checkoutTop {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 18px;
 }
 
 .checkoutTitle {
-  margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 950;
-  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.94);
 }
 
 .checkoutSubtitle {
   margin: 0;
-  font-size: 13.5px;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.74);
+  font-size: 16px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.76);
 }
 
+/* total pill (maior) */
 .totalPill {
   display: inline-flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
 
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
 
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   text-align: right;
-  min-width: 170px;
+  min-width: 220px;
 }
 
 .totalPillLabel {
-  font-size: 12px;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .totalPillValue {
-  font-size: 20px;
-  font-weight: 950;
+  font-size: 26px;
+  font-weight: 1000;
   color: rgba(160, 234, 82, 0.96);
-  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  text-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
 }
 
 /* =========================
-   RESUMO
+   RESUMO (MAIOR)
 ========================= */
 .summaryGrid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr 1fr;
-  gap: 14px;
+  gap: 18px;
   align-items: stretch;
 }
 
 .summaryItem {
-  padding: 14px 14px;
-  border-radius: 10px;
+  padding: 18px 18px;
+  border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.14);
 
   box-shadow:
@@ -158,16 +212,18 @@
 
 .summaryLabel {
   display: block;
-  margin-bottom: 10px;
-  font-size: 12.5px;
-  font-weight: 900;
+  margin-bottom: 12px;
+  font-size: 13.5px;
+  font-weight: 950;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.74);
 }
 
 .summaryValue {
-  font-size: 18px;
-  font-weight: 950;
-  color: rgba(255, 255, 255, 0.92);
+  font-size: 22px;
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.94);
 }
 
 .summaryValue.is-strong {
@@ -177,59 +233,61 @@
 .summaryValueRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .summaryHint {
-  font-size: 13px;
-  font-weight: 850;
-  color: rgba(255, 255, 255, 0.70);
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.72);
 }
 
-/* input de créditos */
+/* input de créditos (maior) */
 .creditsInput {
-  width: 120px;
-  height: 40px;
-  padding: 0 10px;
+  width: 160px;
+  height: 52px;
+  padding: 0 14px;
 
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(0, 0, 0, 0.18);
 
   color: rgba(255, 255, 255, 0.96);
-  font-size: 15px;
-  font-weight: 950;
+  font-size: 17px;
+  font-weight: 1000;
 
   outline: none;
-  transition: border-color 160ms ease, background 160ms ease;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
 .creditsInput:focus {
   border-color: rgba(180, 255, 120, 0.38);
   background: rgba(0, 0, 0, 0.22);
+  box-shadow: 0 0 0 4px rgba(180, 255, 120, 0.10);
 }
 
 /* =========================
-   PAGAMENTO
+   PAGAMENTO (MAIOR)
 ========================= */
 .sectionTitle {
-  margin: 0 0 12px;
-  font-size: 16px;
-  font-weight: 950;
-  color: rgba(255, 255, 255, 0.90);
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .payOptions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 18px;
 }
 
 .payOption {
-  border-radius: 12px;
-  padding: 14px 14px;
+  position: relative;
+  border-radius: 16px;
+  padding: 18px 18px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.14);
 
   box-shadow:
@@ -245,7 +303,7 @@
 .payOption:hover {
   transform: translateY(-1px);
   border-color: rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .payOption.is-selected {
@@ -265,15 +323,15 @@
 
 .payOptionTop {
   display: grid;
-  grid-template-columns: 44px 1fr 22px;
-  gap: 12px;
+  grid-template-columns: 54px 1fr 26px;
+  gap: 14px;
   align-items: center;
 }
 
 .payIconWrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
 
   display: grid;
   place-items: center;
@@ -283,8 +341,8 @@
 }
 
 .payIcon {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   opacity: 0.95;
   color: rgba(255, 255, 255, 0.92);
 }
@@ -295,76 +353,119 @@
 
 .payTitle {
   display: block;
-  font-size: 14.5px;
-  font-weight: 950;
-  color: rgba(255, 255, 255, 0.92);
+  font-size: 16.5px;
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.94);
 }
 
 .payDesc {
   display: block;
-  margin-top: 3px;
-  font-size: 12.5px;
-  font-weight: 850;
-  color: rgba(255, 255, 255, 0.70);
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .paySelectedIco {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   color: rgba(160, 234, 82, 0.96);
   filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.24));
 }
 
 .payFoot {
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .payMini {
-  font-size: 12.5px;
-  font-weight: 850;
+  font-size: 14px;
+  font-weight: 900;
   color: rgba(255, 255, 255, 0.74);
 }
 
 /* =========================
-   AÇÕES
+   AÇÕES (MAIOR)
 ========================= */
 .checkoutActions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 18px;
   flex-wrap: wrap;
 }
 
 .confirmNote {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
 
   background: rgba(0, 0, 0, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.14);
 
-  color: rgba(255, 255, 255, 0.84);
-  font-size: 12.8px;
-  font-weight: 850;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 14.5px;
+  font-weight: 900;
+}
+
+.confirmNote b {
+  color: rgba(255, 255, 255, 0.96);
+  font-weight: 1000;
 }
 
 .confirmNoteIco {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   color: rgba(160, 234, 82, 0.95);
 }
 
-.concludeBtn {
-  height: 44px;
+.checkoutBtns {
+  display: inline-flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  height: 54px;
   min-width: 220px;
-  padding: 0 18px;
-  border-radius: 10px;
+  padding: 0 22px;
+  border-radius: 14px;
+
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 15px;
+  font-weight: 1000;
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 180ms ease, filter 180ms ease, background 180ms ease;
+}
+
+.cancelBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.07);
+  filter: brightness(1.02);
+}
+
+.cancelBtn:active {
+  transform: translateY(0);
+}
+
+.concludeBtn {
+  height: 54px;
+  min-width: 260px;
+  padding: 0 22px;
+  border-radius: 14px;
 
   border: 1px solid rgba(255, 255, 255, 0.18);
 
@@ -375,8 +476,8 @@
   );
 
   color: rgba(255, 255, 255, 0.98);
-  font-size: 14px;
-  font-weight: 950;
+  font-size: 15px;
+  font-weight: 1000;
   letter-spacing: 0.2px;
 
   cursor: pointer;
@@ -408,7 +509,13 @@
 /* =========================
    RESPONSIVO
 ========================= */
-@media (max-width: 860px) {
+@media (max-width: 980px) {
+  .checkoutCard {
+    padding: 40px;
+    width: min(1100px, 100%);
+    min-height: auto;
+  }
+
   .summaryGrid {
     grid-template-columns: 1fr;
   }
@@ -418,53 +525,31 @@
   }
 
   .totalPill {
-    min-width: 150px;
+    min-width: 200px;
   }
-}
-.checkoutBtns {
-  display: inline-flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.cancelBtn {
-  height: 44px;
-  min-width: 180px;
-  padding: 0 18px;
-  border-radius: 10px;
-
-  background: rgba(0, 0, 0, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 14px;
-  font-weight: 950;
-  letter-spacing: 0.2px;
-
-  cursor: pointer;
-  user-select: none;
-
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  transition: transform 180ms ease, filter 180ms ease, background 180ms ease;
-}
-
-.cancelBtn:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.07);
-  filter: brightness(1.02);
-}
-
-.cancelBtn:active {
-  transform: translateY(0);
-}
-
-.cancelBtn:focus-visible {
-  outline: 2px solid rgba(180, 255, 120, 0.45);
-  outline-offset: 2px;
 }
 
 @media (max-width: 720px) {
+  .checkoutCard {
+    padding: 26px;
+  }
+
+  .checkoutCardHeader {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .totalPill {
+    width: 100%;
+    text-align: center;
+  }
+
+  .creditsInput {
+    width: 100%;
+  }
+
   .checkoutBtns {
     width: 100%;
   }
@@ -472,5 +557,25 @@
   .cancelBtn,
   .concludeBtn {
     width: 100%;
+    min-width: 0;
+  }
+}
+
+/* =========================
+   ACESSIBILIDADE
+========================= */
+.cancelBtn:focus-visible,
+.concludeBtn:focus-visible,
+.creditsInput:focus-visible,
+.payOption:focus-within {
+  outline: 2px solid rgba(180, 255, 120, 0.45);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .payOption,
+  .cancelBtn,
+  .concludeBtn {
+    transition: none !important;
   }
 }

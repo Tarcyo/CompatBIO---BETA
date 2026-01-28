@@ -1,11 +1,10 @@
-
-import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import "./Sidebar.css";
 
 import logo from "../assets/Logo.png";
+import { useAuth } from "../auth/AuthContext"; // ✅ ajuste o caminho se necessário
 
-/* Ícones (mesmos que você já tinha) */
+/* Ícones */
 function IconUser(props) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -57,9 +56,23 @@ function IconPower(props) {
   );
 }
 
+/* Ícone pequeno pro modal */
+function IconWarning(props) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
+      <path
+        fill="currentColor"
+        d="M12 2 1 21h22L12 2Zm0 6c.55 0 1 .45 1 1v5a1 1 0 0 1-2 0V9c0-.55.45-1 1-1Zm0 11a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 19Z"
+      />
+    </svg>
+  );
+}
+
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { isAuthenticated, authReady, checkAuth } = useAuth(); // ✅
 
   const NAV_ITEMS = useMemo(
     () => [
@@ -73,6 +86,17 @@ export default function Sidebar() {
 
   const navRef = useRef(null);
   const [pill, setPill] = useState({ y: 0, h: 54, show: false });
+
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // ✅ Se perder autenticação enquanto está no app/Sidebar -> manda pro login
+  useEffect(() => {
+    if (!authReady) return;
+    if (!isAuthenticated) {
+      navigate("/login", { replace: true, state: { from: location } });
+    }
+  }, [authReady, isAuthenticated, navigate, location]);
 
   const updatePill = () => {
     const nav = navRef.current;
@@ -94,7 +118,6 @@ export default function Sidebar() {
   };
 
   useLayoutEffect(() => {
-    // garante que medimos depois do DOM aplicar o active
     const raf = requestAnimationFrame(updatePill);
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,57 +130,169 @@ export default function Sidebar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("auth_token");
-    navigate("/", { replace: true });
+  // fecha modal com ESC
+  useLayoutEffect(() => {
+    if (!isLogoutOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setIsLogoutOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isLogoutOpen]);
+
+  const openLogout = () => setIsLogoutOpen(true);
+  const closeLogout = () => {
+    if (isLoggingOut) return;
+    setIsLogoutOpen(false);
+  };
+
+  // ✅ Intercepta cliques nos itens e valida auth antes de navegar
+  const handleProtectedNav = async (e, to) => {
+    e.preventDefault();
+
+    // enquanto ainda não validou auth, não navega
+    if (!authReady) return;
+
+    // revalida na hora (pega expiração do token)
+    const ok = await checkAuth();
+    if (!ok) {
+      navigate("/login", { replace: true, state: { from: location } });
+      return;
+    }
+
+    navigate(to);
+  };
+
+  const confirmLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
+    try {
+      const API_URL = (import.meta?.env?.VITE_API_URL ?? "http://localhost:3000")
+        .toString()
+        .trim();
+
+      await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // mesmo se falhar, seguimos com logout no front
+ } finally {
+  sessionStorage.removeItem("auth_token");
+  setIsLoggingOut(false);
+  setIsLogoutOpen(false);
+
+  // ✅ Vai para /login e dá reload (garante reset total do estado)
+  navigate("/login", { replace: true });
+  window.location.reload();
+}
+
   };
 
   return (
-    <aside className="sb" aria-label="Menu lateral">
-      <div className="sb-top">
-        <div className="sb-brand" aria-label="CompatBio">
-          <img className="sb-logo" src={logo} alt="CompatBio" />
+    <>
+      <aside className="sb" aria-label="Menu lateral">
+        <div className="sb-top">
+          <div className="sb-brand" aria-label="CompatBio">
+            <img className="sb-logo" src={logo} alt="CompatBio" />
+          </div>
+
+          <nav ref={navRef} className="sb-nav" aria-label="Navegação">
+            <span
+              className={`sb-activePill ${pill.show ? "is-show" : ""}`}
+              style={{
+                transform: `translateY(${pill.y}px)`,
+                height: `${pill.h}px`,
+              }}
+              aria-hidden="true"
+            />
+
+            {NAV_ITEMS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={(e) => handleProtectedNav(e, item.to)} // ✅
+                  className={({ isActive }) =>
+                    `sb-item ${isActive ? "is-active" : ""}`
+                  }
+                >
+                  <span className="sb-itemIcon" aria-hidden="true">
+                    <Icon className="sb-icon" />
+                  </span>
+                  <span className="sb-itemLabel">{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
         </div>
 
-        <nav ref={navRef} className="sb-nav" aria-label="Navegação">
-          {/* PILL (highlight) que DESLIZA entre os itens */}
-          <span
-            className={`sb-activePill ${pill.show ? "is-show" : ""}`}
-            style={{
-              transform: `translateY(${pill.y}px)`,
-              height: `${pill.h}px`,
-            }}
-            aria-hidden="true"
-          />
+        <div className="sb-bottom">
+          <button type="button" className="sb-logout" onClick={openLogout}>
+            <span className="sb-logoutIcon" aria-hidden="true">
+              <IconPower className="sb-iconPower" />
+            </span>
+            <span className="sb-logoutLabel">Sair</span>
+          </button>
+        </div>
+      </aside>
 
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `sb-item ${isActive ? "is-active" : ""}`
-                }
+      {/* MODAL LOGOUT */}
+      {isLogoutOpen && (
+        <div
+          className="sb-modalOverlay"
+          role="presentation"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) closeLogout();
+          }}
+        >
+          <div
+            className="sb-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sb-logout-title"
+            aria-describedby="sb-logout-desc"
+          >
+            <div className="sb-modalHeader">
+              <div className="sb-modalIcon" aria-hidden="true">
+                <IconWarning className="sb-modalIconSvg" />
+              </div>
+
+              <div className="sb-modalTitles">
+                <h2 id="sb-logout-title" className="sb-modalTitle">
+                  Deseja realmente sair?
+                </h2>
+                <p id="sb-logout-desc" className="sb-modalDesc">
+                  Você será desconectado e redirecionado para a tela de login.
+                </p>
+              </div>
+            </div>
+
+            <div className="sb-modalActions">
+              <button
+                type="button"
+                className="sb-btn sb-btnGhost"
+                onClick={closeLogout}
+                disabled={isLoggingOut}
               >
-                <span className="sb-itemIcon" aria-hidden="true">
-                  <Icon className="sb-icon" />
-                </span>
-                <span className="sb-itemLabel">{item.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-      </div>
+                Cancelar
+              </button>
 
-      <div className="sb-bottom">
-        <button type="button" className="sb-logout" onClick={handleLogout}>
-          <span className="sb-logoutIcon" aria-hidden="true">
-            <IconPower className="sb-iconPower" />
-          </span>
-          <span className="sb-logoutLabel">Sair</span>
-        </button>
-      </div>
-    </aside>
+              <button
+                type="button"
+                className="sb-btn sb-btnDanger"
+                onClick={confirmLogout}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? "Saindo..." : "Sim, sair"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
